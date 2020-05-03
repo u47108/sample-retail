@@ -1,0 +1,19 @@
+{
+  "name": "move-employee-in-file",
+  "version": "1.0.0",
+  "description": "Process move file recieved from Microservicio 1- Employees",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luis Nunez",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/kms": "^0.2.0",
+    "@google-cloud/logging-bunyan": "^0.9.4",
+    "@google-cloud/storage": "^2.1.0",
+    "bunyan": "^1.8.12",
+    "ftp": "^0.3.10",
+    "ssh2-sftp-client": "^2.4.2"
+  }
+}
