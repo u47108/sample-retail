@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "employees-service"
+  namespace: "default"
+  labels:
+    app: "employees-service"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "employees-service"
+  template:
+    metadata:
+      labels:
+        app: "employees-service"
+    spec:
+      containers:
+      - name: "nginx-1"
+        image: "nginx:latest"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "employees-service-hpa-fokb"
+  namespace: "default"
+  labels:
+    app: "employees-service"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "employees-service"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80

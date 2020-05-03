@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "cleansing-service"
+  namespace: "default"
+  labels:
+    app: "cleansing-service"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "cleansing-service"
+  template:
+    metadata:
+      labels:
+        app: "cleansing-service"
+    spec:
+      containers:
+      - name: "nginx-1"
+        image: "nginx:latest"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "cleansing-service-hpa-vxvb"
+  namespace: "default"
+  labels:
+    app: "cleansing-service"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "cleansing-service"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
