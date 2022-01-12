@@ -9,9 +9,9 @@
   "author": "Luis Nunez",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/kms": "^0.2.0",
-    "@google-cloud/logging-bunyan": "^0.9.4",
-    "@google-cloud/storage": "^2.1.0",
+    "@google-cloud/kms": "^2.0.0",
+    "@google-cloud/logging-bunyan": "^3.0.1",
+    "@google-cloud/storage": "^5.0.0",
     "bunyan": "^1.8.12",
     "ftp": "^0.3.10",
     "ssh2-sftp-client": "^2.4.2"
