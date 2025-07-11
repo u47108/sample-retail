@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/kms": "^0.3.0",
-    "@google-cloud/logging-bunyan": "^0.9.4",
+    "@google-cloud/logging-bunyan": "^4.0.0",
     "@google-cloud/storage": "^2.1.0",
     "bunyan": "^1.8.12",
     "ftp": "^0.3.10",
