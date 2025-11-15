@@ -17,6 +17,10 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<!-- Fix Tomcat vulnerabilities: CVE-2024-34750, CVE-2024-38286 -->
+		<!-- Update to Tomcat 10.1.25+ which fixes these vulnerabilities -->
+		<!-- Version 10.1.33 is the latest stable that fixes the reported CVEs -->
+		<tomcat.version>10.1.33</tomcat.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>

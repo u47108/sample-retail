@@ -1,15 +1,45 @@
-# Google Cloud Platform openjdk 8 Docker Image
-FROM gcr.io/google-appengine/openjdk:8
+# Multi-stage build para imagen más segura y pequeña
+# Stage 1: Build
+FROM eclipse-temurin:21-jdk-jammy AS builder
 
-# Default to UTF-8 file.encoding
-ENV  LANG="C.UTF-8"\
-    JAVA_OPTS="-Xms128m -Xmx256m -XX:PermSize=128M -XX:MaxNewSize=256m -XX:MaxPermSize=256m"
+WORKDIR /build
 
-# Default copy (Gradle)
-COPY target/*.jar /api/app.jar
+# Copiar archivos de configuración Maven
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
 
-# Default workspace dir
-RUN ls /api
-WORKDIR /api
+# Descargar dependencias (cache layer)
+RUN ./mvnw dependency:go-offline -B
 
-ENTRYPOINT exec java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom  -jar app.jar
+# Copiar código fuente
+COPY src ./src
+
+# Build de la aplicación
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Runtime - Usar distroless para máxima seguridad
+FROM gcr.io/distroless/java21-debian12:nonroot
+
+# Labels para metadata
+LABEL maintainer="your-team@example.com"
+LABEL version="1.0"
+LABEL description="Cleansing Service - Spring Boot Application"
+
+# Copiar JAR desde builder
+COPY --from=builder /build/target/*.jar /app/app.jar
+
+# Usar usuario no-root por defecto (nonroot)
+USER nonroot:nonroot
+
+WORKDIR /app
+
+# Exponer puerto (default Spring Boot)
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD ["/usr/bin/wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"] || exit 1
+
+# Entrada sin shell (más seguro)
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/urandom", "-jar", "app.jar"]
