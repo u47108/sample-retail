@@ -3,7 +3,6 @@ package com.employees.service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.expression.common.LiteralExpression;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.integration.ftp.session.FtpRemoteFileTemplate;
 import org.springframework.integration.ftp.session.FtpRemoteFileTemplate.ExistsMode;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
-
+import com.employees.client.EmployeeSearchClient;
 import com.employees.dto.ResponseSearch;
 import com.employees.dto.SearchRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,24 +25,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class SearchServiceImpl implements SearchService {
 
 	private String remoteDirectory;
-	private String endpoint;
-	private RestTemplate restTemplate;
+	private final EmployeeSearchClient employeeSearchClient;
 	private FtpRemoteFileTemplate templateFtp;
-	private final HttpHeaders httpHeaders;
 	private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceImpl.class);
 
 	@Autowired
-	public SearchServiceImpl(RestTemplate restTemplate, @Value("${be.endpoint}") String endpoint,
+	public SearchServiceImpl(EmployeeSearchClient employeeSearchClient,
 			FtpRemoteFileTemplate templateFtp,
 			@Value("${ftp.remote.directory}") String remoteDirectory) {
-		LOGGER.debug("Endpoint: {}", endpoint);
 		this.templateFtp = templateFtp;
-		this.restTemplate = restTemplate;
-		this.endpoint = endpoint;
+		this.employeeSearchClient = employeeSearchClient;
 		this.remoteDirectory=remoteDirectory;
-		httpHeaders = new HttpHeaders();
-		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-		httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 	}
 
 	@Override
@@ -57,11 +44,11 @@ public class SearchServiceImpl implements SearchService {
 		LOGGER.info("Init authorize method for call the search");
 		ResponseSearch response = null;
 		try {
-			LOGGER.debug("Endpoint: {}", endpoint);
-			response = restTemplate.getForObject(this.endpoint, ResponseSearch.class);
+			LOGGER.debug("Calling Employee Search API via Feign Client");
+			response = employeeSearchClient.searchEmployees();
 			LOGGER.info("<- search Response: {}", response);
 
-		} catch (HttpStatusCodeException | ResourceAccessException exception) {
+		} catch (Exception exception) {
 			LOGGER.error("Consuming REST error: {}", exception);
 			response = new ResponseSearch();
 			response.setStatus("Error when consume employees");
