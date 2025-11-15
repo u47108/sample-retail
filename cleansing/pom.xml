@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.0</version>
+		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cleansing</groupId>
@@ -17,10 +17,8 @@
 
 	<properties>
 		<java.version>21</java.version>
-		<!-- Fix Tomcat vulnerabilities: CVE-2024-34750, CVE-2024-38286 -->
-		<!-- Update to Tomcat 10.1.25+ which fixes these vulnerabilities -->
-		<!-- Version 10.1.33 is the latest stable that fixes the reported CVEs -->
-		<tomcat.version>10.1.33</tomcat.version>
+		<!-- Spring Boot 3.5.7 includes Tomcat 10.1.x with latest security fixes -->
+		<!-- No need to override tomcat.version as Spring Boot manages it -->
 	</properties>
 	<dependencyManagement>
 		<dependencies>
